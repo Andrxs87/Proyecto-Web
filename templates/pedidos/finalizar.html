@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block titulo %}Finalizar pedido | Urbano Store{% endblock %}
+
+{% block contenido %}
+<h2>Finalizar pedido</h2>
+
+<div class="carrito">
+    <table class="tabla-carrito">
+        <thead>
+            <tr><th>Producto</th><th>Talla</th><th>Cantidad</th><th>Subtotal</th></tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.producto.nombre }}<br><small>${{ item.producto.precio|floatformat:"0g" }} c/u</small></td>
+                <td>{{ item.producto.talla }}</td>
+                <td>{{ item.cantidad }}</td>
+                <td>${{ item.subtotal|floatformat:"0g" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="resumen">
+        <h3>Confirmar</h3>
+        <form method="post" class="formulario">
+            {% csrf_token %}
+            {% for campo in form %}
+                <div class="campo">
+                    {{ campo.label_tag }}
+                    {{ campo }}
+                    {% for error in campo.errors %}<small class="error">{{ error }}</small>{% endfor %}
+                </div>
+            {% endfor %}
+            <p class="total-final"><span>Total</span> <span>${{ total|floatformat:"0g" }}</span></p>
+            <small class="ayuda">Pago simulado: no se realiza ningún cobro real.</small>
+            <button type="submit" class="boton">Confirmar pedido</button>
+        </form>
+        <a class="boton secundario" href="{% url 'carrito' %}">Volver al carrito</a>
+    </div>
+</div>
+{% endblock %}

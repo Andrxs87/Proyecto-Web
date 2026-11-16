@@ -6,7 +6,9 @@ from django.views.decorators.http import require_POST
 from catalogo.models import Producto
 from cuentas.decorators import cliente_requerido
 
-from .models import Carrito, ItemCarrito
+from .forms import DireccionEnvioForm
+from .models import Carrito, ItemCarrito, Pedido
+from .servicios import PedidoInvalido, cancelar_pedido, crear_pedido, problema_en_items
 
 
 def obtener_carrito(usuario):
@@ -113,3 +115,65 @@ def _responder(request, ok, mensaje, destino):
         )
     (messages.success if ok else messages.error)(request, mensaje)
     return destino
+
+
+# ---------- Pedidos ----------
+
+@cliente_requerido
+def finalizar(request):
+    carrito = obtener_carrito(request.user)
+    items = list(carrito.items.select_related("producto").order_by("id"))
+
+    if not items:
+        messages.error(request, "Tu carrito está vacío.")
+        return redirect("carrito")
+
+    problema = problema_en_items(items)
+    if problema:
+        messages.error(request, problema)
+        return redirect("carrito")
+
+    if request.method == "POST":
+        form = DireccionEnvioForm(request.POST)
+        if form.is_valid():
+            try:
+                pedido = crear_pedido(request.user, form.cleaned_data["direccion_envio"])
+            except PedidoInvalido as error:
+                messages.error(request, str(error))
+                return redirect("carrito")
+            messages.success(request, f"¡Pedido #{pedido.pk} confirmado! Gracias por tu compra.")
+            return redirect("pedido_detalle", pk=pedido.pk)
+    else:
+        form = DireccionEnvioForm(initial={"direccion_envio": request.user.direccion})
+
+    total = sum(item.subtotal for item in items)
+    return render(
+        request, "pedidos/finalizar.html", {"items": items, "total": total, "form": form}
+    )
+
+
+@cliente_requerido
+def mis_pedidos(request):
+    pedidos = Pedido.objects.filter(usuario=request.user)
+    return render(request, "pedidos/mis_pedidos.html", {"pedidos": pedidos})
+
+
+@cliente_requerido
+def detalle_pedido(request, pk):
+    # Solo se puede ver un pedido propio (si no, 404)
+    pedido = get_object_or_404(
+        Pedido.objects.prefetch_related("detalles__producto"), pk=pk, usuario=request.user
+    )
+    return render(request, "pedidos/detalle.html", {"pedido": pedido})
+
+
+@cliente_requerido
+@require_POST
+def cancelar(request, pk):
+    pedido = get_object_or_404(Pedido, pk=pk, usuario=request.user)
+    try:
+        cancelar_pedido(pedido.pk, request.user)
+        messages.success(request, f"El pedido #{pedido.pk} fue cancelado.")
+    except PedidoInvalido as error:
+        messages.error(request, str(error))
+    return redirect("pedido_detalle", pk=pedido.pk)

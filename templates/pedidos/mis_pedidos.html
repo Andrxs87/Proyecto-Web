@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block titulo %}Mis pedidos | Urbano Store{% endblock %}
+
+{% block contenido %}
+<h2>Mis pedidos</h2>
+
+{% if pedidos %}
+    <table class="tabla-carrito">
+        <thead>
+            <tr><th>N.º</th><th>Fecha</th><th>Estado</th><th>Total</th><th></th></tr>
+        </thead>
+        <tbody>
+            {% for pedido in pedidos %}
+            <tr>
+                <td>#{{ pedido.pk }}</td>
+                <td>{{ pedido.fecha_pedido|date:"d/m/Y H:i" }}</td>
+                <td><span class="estado estado-{{ pedido.estado }}">{{ pedido.get_estado_display }}</span></td>
+                <td>${{ pedido.total|floatformat:"0g" }}</td>
+                <td><a href="{% url 'pedido_detalle' pedido.pk %}">Ver detalle</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <section class="caja">
+        <p>Aún no has realizado pedidos.</p>
+        <a class="boton" href="{% url 'catalogo' %}">Ver catálogo</a>
+    </section>
+{% endif %}
+{% endblock %}

@@ -57,7 +57,11 @@
             <p><span>Subtotal</span> <span>${{ total|floatformat:"0g" }}</span></p>
             <p><span>Envío</span> <span>Gratis (simulado)</span></p>
             <p class="total-final"><span>Total</span> <span>${{ total|floatformat:"0g" }}</span></p>
-            {# Etapa 5: botón "Finalizar pedido" #}
+            {% if hay_problemas %}
+                <p class="error">Resuelve los avisos en rojo para poder finalizar el pedido.</p>
+            {% else %}
+                <a class="boton" href="{% url 'finalizar_pedido' %}">Finalizar pedido</a>
+            {% endif %}
             <a class="boton secundario" href="{% url 'catalogo' %}">Seguir comprando</a>
         </div>
     </div>

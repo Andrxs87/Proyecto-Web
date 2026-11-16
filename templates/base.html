@@ -21,6 +21,9 @@
                     {% if user.is_staff %}
                         <li><a href="{% url 'admin:index' %}">Administración</a></li>
                     {% endif %}
+                    {% if not user.is_staff %}
+                        <li><a href="{% url 'mis_pedidos' %}">Mis pedidos</a></li>
+                    {% endif %}
                     <li class="saludo">Hola, {{ user.first_name|default:user.username }}</li>
                     <li>
                         <form method="post" action="{% url 'logout' %}">
