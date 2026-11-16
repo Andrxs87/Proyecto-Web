@@ -1,3 +1,6 @@
 from django.shortcuts import render
 
-# Create your views here.
+
+def inicio(request):
+    # Provisional: en la etapa 3 se completa con categorías y destacados
+    return render(request, "inicio.html")
