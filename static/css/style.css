@@ -421,3 +421,125 @@ button.boton {
         height: 260px;
     }
 }
+
+/* ---------- Etapa 4: carrito ---------- */
+.form-agregar {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+}
+
+.form-agregar input {
+    width: 80px;
+    padding: 0.4rem;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+}
+
+.form-agregar .boton {
+    margin-top: 0;
+}
+
+.mensaje-ok,
+.mensaje-error {
+    padding: 0.6rem 0.8rem;
+    border-radius: 4px;
+}
+
+.mensaje-ok {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.mensaje-error {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.mensaje-ok:empty,
+.mensaje-error:empty {
+    display: none;
+}
+
+.carrito {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.tabla-carrito {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.tabla-carrito th,
+.tabla-carrito td {
+    padding: 0.8rem;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.tabla-carrito th {
+    background-color: #f3f4f6;
+}
+
+.cantidad {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cantidad button,
+.quitar {
+    width: 28px;
+    height: 28px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    background-color: white;
+    cursor: pointer;
+}
+
+.cantidad button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.quitar:hover {
+    background-color: #fee2e2;
+}
+
+.resumen {
+    padding: 1.2rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.resumen p {
+    display: flex;
+    justify-content: space-between;
+    margin: 0.6rem 0;
+}
+
+.resumen .total-final {
+    padding-top: 0.6rem;
+    border-top: 1px solid #e5e7eb;
+    font-weight: bold;
+}
+
+.boton.secundario {
+    background-color: #e5e7eb;
+    color: var(--color-texto);
+}
+
+@media (max-width: 768px) {
+    .carrito {
+        grid-template-columns: 1fr;
+    }
+}
