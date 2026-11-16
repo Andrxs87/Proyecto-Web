@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block titulo %}Catálogo | Urbano Store{% endblock %}
+
+{% block contenido %}
+<h2>Catálogo</h2>
+
+<div class="catalogo">
+    <div class="filtros">
+        <form id="form-filtros" method="get" action="{% url 'catalogo' %}" class="formulario">
+            {% for campo in form %}
+                <div class="campo">
+                    {{ campo.label_tag }}
+                    {{ campo }}
+                    {% for error in campo.errors %}<small class="error">{{ error }}</small>{% endfor %}
+                </div>
+            {% endfor %}
+            <button type="submit" class="boton">Aplicar filtros</button>
+            <a class="limpiar" href="{% url 'catalogo' %}">Limpiar</a>
+        </form>
+    </div>
+
+    <section id="resultados">
+        {% include "catalogo/_resultados.html" %}
+    </section>
+</div>
+
+<script src="{% static 'js/catalogo.js' %}"></script>
+{% endblock %}

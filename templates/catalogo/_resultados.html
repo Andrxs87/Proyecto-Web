@@ -1,0 +1,29 @@
+<p class="total">{{ total }} producto{{ total|pluralize }}</p>
+
+{% if pagina.object_list %}
+    <div class="productos">
+        {% for producto in pagina %}
+            {% include "catalogo/_tarjeta.html" %}
+        {% endfor %}
+    </div>
+
+    {% if pagina.paginator.num_pages > 1 %}
+        <div class="paginacion">
+            {% if pagina.has_previous %}
+                <a class="pagina" href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ pagina.previous_page_number }}">&lsaquo;</a>
+            {% endif %}
+            {% for n in pagina.paginator.page_range %}
+                {% if n == pagina.number %}
+                    <span class="actual">{{ n }}</span>
+                {% else %}
+                    <a class="pagina" href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ n }}">{{ n }}</a>
+                {% endif %}
+            {% endfor %}
+            {% if pagina.has_next %}
+                <a class="pagina" href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ pagina.next_page_number }}">&rsaquo;</a>
+            {% endif %}
+        </div>
+    {% endif %}
+{% else %}
+    <p class="vacio">No encontramos productos con esos filtros.</p>
+{% endif %}
