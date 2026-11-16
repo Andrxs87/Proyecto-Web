@@ -20,6 +20,12 @@ PRODUCTOS = [
     ("Chaquetas", "Chaqueta bomber", "Forro interno ligero", 189900, "M", 5),
     ("Chaquetas", "Chaqueta jean", "Denim con botones metálicos", 159900, "L", 7),
     ("Accesorios", "Gorra negra", "Ajustable", 39900, "UNICA", 25),
+    # Mismo producto en otras tallas (una fila por talla)
+    ("Camisetas", "Camiseta oversize", "Algodón 100%, corte holgado", 89900, "S", 10),
+    ("Camisetas", "Camiseta oversize", "Algodón 100%, corte holgado", 89900, "L", 4),
+    ("Pantalones", "Jean recto", "Denim azul medio", 129900, "L", 0),
+    ("Accesorios", "Bufanda tejida", "Lana suave", 59900, "UNICA", 9),
+    ("Chaquetas", "Buzo con capota", "Algodón perchado", 139900, "XL", 6),
 ]
 
 
@@ -54,7 +60,7 @@ class Command(BaseCommand):
                 defaults={"categoria": categoria, "descripcion": desc, "precio": precio},
             )
             # El stock inicial también se registra en el historial
-            if creado:
+            if creado and stock > 0:
                 ajustar_stock(producto.pk, stock, MovimientoStock.Tipo.ENTRADA,
                               admin, motivo="Stock inicial")
 
