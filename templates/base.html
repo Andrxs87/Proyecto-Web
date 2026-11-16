@@ -13,8 +13,7 @@
         <nav>
             <ul>
                 <li><a href="{% url 'inicio' %}">Inicio</a></li>
-                <li><a href="{% url 'catalogo' %}">Catálogo</a></li>
-                {# Etapa 4: Carrito #}
+                {# Etapa 3: Catálogo | Etapa 4: Carrito #}
                 {% if user.is_authenticated %}
                     {% if user.is_staff %}
                         <li><a href="{% url 'admin:index' %}">Administración</a></li>

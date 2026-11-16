@@ -6,35 +6,5 @@
 <section class="hero">
     <h2>Nueva colección</h2>
     <p>Ropa cómoda y con estilo para todos los días.</p>
-    <a class="boton" href="{% url 'catalogo' %}">Ver catálogo</a>
 </section>
-
-{% if categorias %}
-<section>
-    <h2>Categorías</h2>
-    <ul class="categorias">
-        {% for categoria in categorias %}
-            <li><a href="{% url 'catalogo' %}?categoria={{ categoria.pk }}">{{ categoria.nombre }}</a></li>
-        {% endfor %}
-    </ul>
-</section>
-{% endif %}
-
-<section>
-    <h2>Productos destacados</h2>
-    {% if destacados %}
-        <div class="productos">
-            {% for producto in destacados %}
-                {% include "catalogo/_tarjeta.html" %}
-            {% endfor %}
-        </div>
-    {% else %}
-        <p class="vacio">Pronto tendremos productos disponibles.</p>
-    {% endif %}
-</section>
-
-<aside>
-    <h3>Promoción</h3>
-    <p>Envío gratis en compras superiores a $200.000.</p>
-</aside>
 {% endblock %}
