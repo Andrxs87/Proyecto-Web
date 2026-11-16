@@ -543,3 +543,30 @@ button.boton {
         grid-template-columns: 1fr;
     }
 }
+
+/* ---------- Etapa 5: pedidos ---------- */
+.estado {
+    display: inline-block;
+    padding: 0.15rem 0.7rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: normal;
+}
+
+.estado-pendiente { background-color: #fef3c7; color: #92400e; }
+.estado-enviado { background-color: #dbeafe; color: #1e40af; }
+.estado-entregado { background-color: #d1fae5; color: #065f46; }
+.estado-cancelado { background-color: #fee2e2; color: #991b1b; }
+
+button.boton.peligro {
+    background-color: #b91c1c;
+}
+
+.resumen .formulario .campo {
+    display: block;
+}
+
+.resumen p span:last-child {
+    text-align: right;
+    max-width: 60%;
+}

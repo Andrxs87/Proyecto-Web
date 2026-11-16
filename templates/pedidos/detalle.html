@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block titulo %}Pedido #{{ pedido.pk }} | Urbano Store{% endblock %}
+
+{% block contenido %}
+<p class="migas"><a href="{% url 'mis_pedidos' %}">Mis pedidos</a> / Pedido #{{ pedido.pk }}</p>
+
+<h2>Pedido #{{ pedido.pk }} <span class="estado estado-{{ pedido.estado }}">{{ pedido.get_estado_display }}</span></h2>
+
+<div class="carrito">
+    <table class="tabla-carrito">
+        <thead>
+            <tr><th>Producto</th><th>Talla</th><th>Cantidad</th><th>Precio</th><th>Subtotal</th></tr>
+        </thead>
+        <tbody>
+            {% for detalle in pedido.detalles.all %}
+            <tr>
+                <td>{{ detalle.producto.nombre }}</td>
+                <td>{{ detalle.producto.talla }}</td>
+                <td>{{ detalle.cantidad }}</td>
+                <td>${{ detalle.precio_unitario|floatformat:"0g" }}</td>
+                <td>${{ detalle.subtotal|floatformat:"0g" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="resumen">
+        <h3>Datos del pedido</h3>
+        <p><span>Fecha</span> <span>{{ pedido.fecha_pedido|date:"d/m/Y H:i" }}</span></p>
+        <p><span>Envío a</span> <span>{{ pedido.direccion_envio }}</span></p>
+        <p class="total-final"><span>Total</span> <span>${{ pedido.total|floatformat:"0g" }}</span></p>
+
+        {% if pedido.estado == "pendiente" %}
+            <form method="post" action="{% url 'pedido_cancelar' pedido.pk %}"
+                  onsubmit="return confirm('¿Seguro que quieres cancelar este pedido?');">
+                {% csrf_token %}
+                <button type="submit" class="boton peligro">Cancelar pedido</button>
+            </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
