@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block titulo %}Tu carrito | Urbano Store{% endblock %}
+
+{% block contenido %}
+<h2>Tu carrito</h2>
+
+{% if items %}
+    <div class="carrito">
+        <table class="tabla-carrito">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Talla</th>
+                    <th>Cantidad</th>
+                    <th>Subtotal</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>
+                        <a href="{% url 'detalle_producto' item.producto.pk %}">{{ item.producto.nombre }}</a><br>
+                        <small>${{ item.producto.precio|floatformat:"0g" }} c/u</small>
+                        {% if not item.producto.activo %}
+                            <br><small class="error">Este producto ya no está disponible. Quítalo del carrito.</small>
+                        {% elif item.cantidad > item.producto.stock %}
+                            <br><small class="error">Solo hay {{ item.producto.stock }} unidad(es) disponible(s).</small>
+                        {% endif %}
+                    </td>
+                    <td>{{ item.producto.talla }}</td>
+                    <td>
+                        <form method="post" action="{% url 'carrito_actualizar' item.pk %}" class="cantidad">
+                            {% csrf_token %}
+                            <button type="submit" name="cantidad" value="{{ item.cantidad|add:'-1' }}"
+                                    {% if item.cantidad <= 1 %}disabled{% endif %}>−</button>
+                            <span>{{ item.cantidad }}</span>
+                            <button type="submit" name="cantidad" value="{{ item.cantidad|add:'1' }}"
+                                    {% if item.cantidad >= item.producto.stock %}disabled{% endif %}>+</button>
+                        </form>
+                    </td>
+                    <td>${{ item.subtotal|floatformat:"0g" }}</td>
+                    <td>
+                        <form method="post" action="{% url 'carrito_quitar' item.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="quitar" title="Quitar del carrito">✕</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="resumen">
+            <h3>Resumen</h3>
+            <p><span>Subtotal</span> <span>${{ total|floatformat:"0g" }}</span></p>
+            <p><span>Envío</span> <span>Gratis (simulado)</span></p>
+            <p class="total-final"><span>Total</span> <span>${{ total|floatformat:"0g" }}</span></p>
+            {# Etapa 5: botón "Finalizar pedido" #}
+            <a class="boton secundario" href="{% url 'catalogo' %}">Seguir comprando</a>
+        </div>
+    </div>
+{% else %}
+    <section class="caja">
+        <p>Tu carrito está vacío.</p>
+        <a class="boton" href="{% url 'catalogo' %}">Ver catálogo</a>
+    </section>
+{% endif %}
+{% endblock %}

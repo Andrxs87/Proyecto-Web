@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block titulo %}{{ producto.nombre }} | Urbano Store{% endblock %}
 
@@ -34,11 +35,24 @@
             <p class="stock agotado">Agotado</p>
         {% endif %}
 
-        {# Etapa 4: aquí va el formulario "Agregar al carrito" #}
-        {% if not user.is_authenticated %}
+        {% if user.is_authenticated and not user.is_staff %}
+            {% if producto.stock > 0 %}
+                <form id="form-agregar" method="post" action="{% url 'carrito_agregar' producto.pk %}" class="form-agregar">
+                    {% csrf_token %}
+                    <label for="cantidad">Cantidad</label>
+                    <input type="number" name="cantidad" id="cantidad" value="1" min="1" max="{{ producto.stock }}">
+                    <button type="submit" class="boton">Agregar al carrito</button>
+                </form>
+                <p id="mensaje-carrito" role="status"></p>
+            {% endif %}
+        {% elif user.is_staff %}
+            <p class="aviso">Las cuentas de administración no realizan compras.</p>
+        {% else %}
             <p class="aviso">Si no has iniciado sesión, te pediremos ingresar para comprar.
                 <a href="{% url 'login' %}?next={{ request.path }}">Iniciar sesión</a></p>
         {% endif %}
     </div>
 </article>
+
+<script src="{% static 'js/carrito.js' %}"></script>
 {% endblock %}
