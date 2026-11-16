@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block titulo %}Registro | Urbano Store{% endblock %}
+
+{% block contenido %}
+<section class="caja">
+    <h2>Crear cuenta</h2>
+
+    <form method="post" class="formulario">
+        {% csrf_token %}
+
+        {% for campo in form %}
+            <div class="campo">
+                {{ campo.label_tag }}
+                {{ campo }}
+                {% if campo.help_text %}<small class="ayuda">{{ campo.help_text|safe }}</small>{% endif %}
+                {% for error in campo.errors %}<small class="error">{{ error }}</small>{% endfor %}
+            </div>
+        {% endfor %}
+
+        <button type="submit" class="boton">Registrarme</button>
+    </form>
+
+    <p class="aparte">¿Ya tienes cuenta? <a href="{% url 'login' %}">Inicia sesión</a></p>
+</section>
+{% endblock %}

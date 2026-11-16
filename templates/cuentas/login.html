@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block titulo %}Iniciar sesión | Urbano Store{% endblock %}
+
+{% block contenido %}
+<section class="caja">
+    <h2>Iniciar sesión</h2>
+
+    <form method="post" class="formulario">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}">
+
+        {% if form.non_field_errors %}
+            <ul class="errores">
+                {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+            </ul>
+        {% endif %}
+
+        {% for campo in form %}
+            <div class="campo">
+                {{ campo.label_tag }}
+                {{ campo }}
+                {% for error in campo.errors %}<small class="error">{{ error }}</small>{% endfor %}
+            </div>
+        {% endfor %}
+
+        <button type="submit" class="boton">Ingresar</button>
+    </form>
+
+    <p class="aparte">¿No tienes cuenta? <a href="{% url 'registro' %}">Regístrate</a></p>
+</section>
+{% endblock %}
