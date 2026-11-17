@@ -1,0 +1,15 @@
+{% if pedido.siguientes %}
+    <form method="post" action="{% url 'panel_pedido_estado' pedido.pk %}" class="en-linea">
+        {% csrf_token %}
+        <input type="hidden" name="volver" value="{{ volver }}">
+        <select name="estado">
+            <option value="{{ pedido.estado }}" selected>{{ pedido.get_estado_display }}</option>
+            {% for valor, etiqueta in pedido.siguientes %}
+                <option value="{{ valor }}">{{ etiqueta }}{% if valor == "cancelado" %} (devuelve el stock){% endif %}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="boton chico">Guardar</button>
+    </form>
+{% else %}
+    <span class="estado estado-{{ pedido.estado }}">{{ pedido.get_estado_display }}</span>
+{% endif %}

@@ -1,0 +1,63 @@
+{% extends "panel/base_panel.html" %}
+
+{% block titulo %}Historial de stock | Administración{% endblock %}
+
+{% block panel %}
+<h2>Historial de stock</h2>
+
+{% if inconsistentes %}
+    <div class="alerta alerta-error">
+        <strong>⚠ El stock de estos productos NO coincide con su historial:</strong>
+        <ul>
+            {% for p in inconsistentes %}
+                <li>{{ p.nombre }} ({{ p.talla }}): stock registrado {{ p.stock }}, según movimientos {{ p.suma }}</li>
+            {% endfor %}
+        </ul>
+        Esto indica que el inventario fue modificado sin pasar por el sistema.
+    </div>
+{% else %}
+    <div class="alerta alerta-ok">✔ El stock de todos los productos coincide con la suma de sus movimientos.</div>
+{% endif %}
+
+<form method="get" class="en-linea filtros-historial">
+    <select name="producto">
+        <option value="">Todos los productos</option>
+        {% for p in productos %}
+            <option value="{{ p.pk }}" {% if producto_id == p.pk|stringformat:"s" %}selected{% endif %}>{{ p.nombre }} ({{ p.talla }})</option>
+        {% endfor %}
+    </select>
+    <select name="tipo">
+        <option value="">Todos los tipos</option>
+        {% for valor, etiqueta in tipos %}
+            <option value="{{ valor }}" {% if valor == tipo %}selected{% endif %}>{{ etiqueta }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit" class="boton chico">Filtrar</button>
+</form>
+
+<div class="tabla-scroll">
+<table class="tabla-carrito">
+    <thead>
+        <tr><th>Fecha</th><th>Producto</th><th>Tipo</th><th>Cantidad</th><th>Stock</th><th>Usuario</th><th>Pedido</th><th>Motivo</th></tr>
+    </thead>
+    <tbody>
+        {% for m in pagina %}
+        <tr>
+            <td>{{ m.fecha|date:"d/m/Y H:i" }}</td>
+            <td>{{ m.producto.nombre }} ({{ m.producto.talla }})</td>
+            <td>{{ m.get_tipo_display }}</td>
+            <td class="{% if m.cantidad > 0 %}positivo{% else %}negativo{% endif %}">{{ m.cantidad }}</td>
+            <td>{{ m.stock_anterior }} → {{ m.stock_nuevo }}</td>
+            <td>{{ m.usuario }}</td>
+            <td>{% if m.pedido %}<a href="{% url 'panel_pedido_detalle' m.pedido_id %}">#{{ m.pedido_id }}</a>{% else %}—{% endif %}</td>
+            <td>{{ m.motivo }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="8" class="vacio">Sin movimientos.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+{% include "panel/_paginacion.html" %}
+{% endblock %}
