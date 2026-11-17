@@ -1,0 +1,52 @@
+{% extends "panel/base_panel.html" %}
+
+{% block titulo %}Productos | Administración{% endblock %}
+
+{% block panel %}
+<div class="barra">
+    <h2>Productos</h2>
+    <a class="boton" href="{% url 'panel_producto_nuevo' %}">+ Nuevo producto</a>
+</div>
+
+<form method="get" class="busqueda">
+    <input type="text" name="q" value="{{ q }}" placeholder="Buscar por nombre">
+    <button type="submit" class="boton">Buscar</button>
+</form>
+
+<div class="tabla-scroll">
+<table class="tabla-carrito">
+    <thead>
+        <tr><th>Nombre</th><th>Categoría</th><th>Talla</th><th>Precio</th><th>Stock</th><th>Activo</th><th>Acciones</th></tr>
+    </thead>
+    <tbody>
+        {% for p in pagina %}
+        <tr>
+            <td>{{ p.nombre }}</td>
+            <td>{{ p.categoria }}</td>
+            <td>{{ p.talla }}</td>
+            <td>${{ p.precio|floatformat:"0g" }}</td>
+            <td>{{ p.stock }}</td>
+            <td>
+                <form method="post" action="{% url 'panel_producto_toggle' p.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="estado {% if p.activo %}estado-entregado{% else %}estado-cancelado{% endif %} insignia"
+                            title="Clic para {% if p.activo %}desactivar{% else %}activar{% endif %}">
+                        {% if p.activo %}Activo{% else %}Inactivo{% endif %}
+                    </button>
+                </form>
+            </td>
+            <td class="acciones">
+                <a href="{% url 'panel_producto_editar' p.pk %}">Editar</a>
+                <a href="{% url 'panel_producto_stock' p.pk %}">Ajustar stock</a>
+                <a href="{% url 'panel_historial' %}?producto={{ p.pk }}">Historial</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="vacio">No hay productos.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+{% include "panel/_paginacion.html" %}
+{% endblock %}

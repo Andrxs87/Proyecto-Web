@@ -105,3 +105,50 @@ def cancelar_pedido(pedido_id, usuario):
     pedido.estado = Pedido.Estado.CANCELADO
     pedido.save(update_fields=["estado"])
     return pedido
+
+
+# ---------- Cambio de estado (panel del administrador) ----------
+
+# Transiciones permitidas. Entregado y cancelado son estados finales.
+# Cancelar un pedido ya enviado sería una devolución (fuera del alcance).
+TRANSICIONES = {
+    Pedido.Estado.PENDIENTE: {Pedido.Estado.ENVIADO, Pedido.Estado.CANCELADO},
+    Pedido.Estado.ENVIADO: {Pedido.Estado.ENTREGADO},
+    Pedido.Estado.ENTREGADO: set(),
+    Pedido.Estado.CANCELADO: set(),
+}
+
+
+def estados_siguientes(pedido):
+    """Lista de (valor, etiqueta) a los que se puede pasar desde el estado actual."""
+    etiquetas = dict(Pedido.Estado.choices)
+    permitidos = TRANSICIONES[pedido.estado]
+    return [(valor, etiquetas[valor]) for valor in Pedido.Estado.values if valor in permitidos]
+
+
+@transaction.atomic
+def cambiar_estado(pedido_id, nuevo_estado, usuario):
+    """Cambia el estado de un pedido respetando las transiciones permitidas.
+
+    Cancelar pasa por cancelar_pedido(), así el stock se devuelve y queda
+    registrado en el historial (nunca se cambia el estado "a mano").
+    """
+    if nuevo_estado not in Pedido.Estado.values:
+        raise PedidoInvalido("Estado no válido.")
+
+    pedido = Pedido.objects.select_for_update().get(pk=pedido_id)
+    if nuevo_estado == pedido.estado:
+        return pedido
+
+    if nuevo_estado not in TRANSICIONES[pedido.estado]:
+        etiquetas = dict(Pedido.Estado.choices)
+        raise PedidoInvalido(
+            f"No se puede pasar de «{etiquetas[pedido.estado]}» a «{etiquetas[nuevo_estado]}»."
+        )
+
+    if nuevo_estado == Pedido.Estado.CANCELADO:
+        return cancelar_pedido(pedido.pk, usuario)
+
+    pedido.estado = nuevo_estado
+    pedido.save(update_fields=["estado"])
+    return pedido

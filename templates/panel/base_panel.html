@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+<div class="panel">
+    <div class="menu-panel">
+        <h3>Administración</h3>
+        <a href="{% url 'panel_productos' %}" class="{% if seccion == 'productos' %}activo{% endif %}">Productos</a>
+        <a href="{% url 'panel_categorias' %}" class="{% if seccion == 'categorias' %}activo{% endif %}">Categorías</a>
+        <a href="{% url 'panel_pedidos' %}" class="{% if seccion == 'pedidos' %}activo{% endif %}">Pedidos</a>
+        <a href="{% url 'panel_historial' %}" class="{% if seccion == 'historial' %}activo{% endif %}">Historial de stock</a>
+    </div>
+    <section class="contenido-panel">
+        {% block panel %}{% endblock %}
+    </section>
+</div>
+{% endblock %}

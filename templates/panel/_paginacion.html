@@ -1,0 +1,17 @@
+{% if pagina.paginator.num_pages > 1 %}
+    <div class="paginacion">
+        {% if pagina.has_previous %}
+            <a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ pagina.previous_page_number }}">&lsaquo;</a>
+        {% endif %}
+        {% for n in pagina.paginator.page_range %}
+            {% if n == pagina.number %}
+                <span class="actual">{{ n }}</span>
+            {% else %}
+                <a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ n }}">{{ n }}</a>
+            {% endif %}
+        {% endfor %}
+        {% if pagina.has_next %}
+            <a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ pagina.next_page_number }}">&rsaquo;</a>
+        {% endif %}
+    </div>
+{% endif %}
