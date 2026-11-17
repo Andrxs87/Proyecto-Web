@@ -8,6 +8,8 @@ from django.core.management.base import BaseCommand
 
 from catalogo.models import Categoria, MovimientoStock, Producto
 from catalogo.servicios import ajustar_stock
+from pedidos.models import Carrito, ItemCarrito, Pedido
+from pedidos.servicios import cambiar_estado, crear_pedido
 
 PRODUCTOS = [
     # (categoría, nombre, descripción, precio, talla, stock inicial)
@@ -53,6 +55,15 @@ class Command(BaseCommand):
             cliente.set_password("Cliente12345!")
             cliente.save()
 
+        cliente2, creado = Usuario.objects.get_or_create(
+            username="cliente2",
+            defaults={"email": "cliente2@correo.com", "first_name": "Camila",
+                      "last_name": "Ruiz", "direccion": "Carrera 27 # 45-10, Bucaramanga"},
+        )
+        if creado:
+            cliente2.set_password("Cliente12345!")
+            cliente2.save()
+
         for cat, nombre, desc, precio, talla, stock in PRODUCTOS:
             categoria, _ = Categoria.objects.get_or_create(nombre=cat)
             producto, creado = Producto.objects.get_or_create(
@@ -64,6 +75,28 @@ class Command(BaseCommand):
                 ajustar_stock(producto.pk, stock, MovimientoStock.Tipo.ENTRADA,
                               admin, motivo="Stock inicial")
 
+        if not Pedido.objects.exists():
+            self.crear_pedidos_demo(admin, cliente, cliente2)
+
         self.stdout.write(self.style.SUCCESS("Datos de prueba cargados."))
         self.stdout.write("Admin:   admin / Admin12345!")
-        self.stdout.write("Cliente: cliente1 / Cliente12345!")
+        self.stdout.write("Cliente: cliente1 / Cliente12345!  (también cliente2)")
+
+    def crear_pedidos_demo(self, admin, cliente1, cliente2):
+        """Pedidos de ejemplo en distintos estados, creados con los mismos
+        servicios que usa la aplicación (así el stock y el historial cuadran)."""
+        demos = [
+            # (cliente, [(nombre, talla, cantidad)], dirección, estados por los que pasa)
+            (cliente1, [("Camiseta oversize", "M", 2), ("Jean recto", "M", 1)], []),
+            (cliente1, [("Chaqueta bomber", "M", 1)], ["enviado"]),
+            (cliente2, [("Polo clásico", "S", 2), ("Gorra negra", "UNICA", 1)], ["enviado", "entregado"]),
+            (cliente2, [("Pantalón cargo", "M", 1)], ["cancelado"]),
+        ]
+        for usuario, items, estados in demos:
+            carrito, _ = Carrito.objects.get_or_create(usuario=usuario)
+            for nombre, talla, cantidad in items:
+                producto = Producto.objects.get(nombre=nombre, talla=talla)
+                ItemCarrito.objects.create(carrito=carrito, producto=producto, cantidad=cantidad)
+            pedido = crear_pedido(usuario, usuario.direccion)
+            for estado in estados:
+                cambiar_estado(pedido.pk, estado, admin)
